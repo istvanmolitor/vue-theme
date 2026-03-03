@@ -59,17 +59,6 @@ onMounted(() => {
 <template>
   <AdminLayout page-title="Témák">
     <div class="space-y-6">
-      <!-- Page Header -->
-      <div class="flex items-center gap-3">
-        <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-          <Palette class="h-5 w-5 text-primary" />
-        </div>
-        <div>
-          <h1 class="text-xl font-semibold text-foreground">Témakezelő</h1>
-          <p class="text-sm text-muted-foreground">Válassz témát a weboldal megjelenéséhez</p>
-        </div>
-      </div>
-
       <!-- Loading -->
       <div v-if="loading" class="flex items-center justify-center py-16 text-muted-foreground">
         <span class="text-sm">Témák betöltése...</span>
