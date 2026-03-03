@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { AdminLayout } from '@admin'
 import { Check, Palette } from 'lucide-vue-next'
+import { themeService } from '../services/themeService'
 
 interface Theme {
   id: string
@@ -11,58 +12,48 @@ interface Theme {
   active: boolean
 }
 
-const themes = ref<Theme[]>([
-  {
-    id: 'default',
-    name: 'Default',
-    description: 'Az alapértelmezett, tiszta és modern megjelenés. Ideális általános célú weboldalakhoz.',
-    thumbnail: 'https://placehold.co/400x250/6366f1/ffffff?text=Default+Theme',
-    active: true,
-  },
-  {
-    id: 'dark-minimal',
-    name: 'Dark Minimal',
-    description: 'Sötét, minimalista dizájn. Elegáns megjelenés technika- és portfólió oldalakhoz.',
-    thumbnail: 'https://placehold.co/400x250/1e1e2e/cdd6f4?text=Dark+Minimal',
-    active: false,
-  },
-  {
-    id: 'nature',
-    name: 'Nature',
-    description: 'Természetes, zöld tónusokkal teli témakép. Tökéletes környezeti és egészségügyi tartalmakhoz.',
-    thumbnail: 'https://placehold.co/400x250/16a34a/ffffff?text=Nature+Theme',
-    active: false,
-  },
-  {
-    id: 'corporate',
-    name: 'Corporate',
-    description: 'Professzionális üzleti megjelenés. Vállalati és B2B weboldalak ideális választása.',
-    thumbnail: 'https://placehold.co/400x250/0369a1/ffffff?text=Corporate+Theme',
-    active: false,
-  },
-  {
-    id: 'warm',
-    name: 'Warm Sunset',
-    description: 'Meleg, narancs és bordó árnyalatokból álló téma. Kreatív és lifestyle tartalmakhoz ajánlott.',
-    thumbnail: 'https://placehold.co/400x250/ea580c/fff7ed?text=Warm+Sunset',
-    active: false,
-  },
-  {
-    id: 'pastel',
-    name: 'Pastel Dream',
-    description: 'Lágy pasztell színek, letisztult elrendezés. Ideális blog és életmód oldalakhoz.',
-    thumbnail: 'https://placehold.co/400x250/f9a8d4/4a044e?text=Pastel+Dream',
-    active: false,
-  },
-])
+const themes = ref<Theme[]>([])
+const loading = ref(false)
+const error = ref<string | null>(null)
 
-const activateTheme = (themeId: string) => {
-  // TODO: Backend hívás implementálása a téma mentéséhez
-  themes.value = themes.value.map(t => ({
-    ...t,
-    active: t.id === themeId,
-  }))
+const thumbnailUrl = (theme: string, name: string) =>
+  theme || `https://placehold.co/400x250?text=${encodeURIComponent(name)}`
+
+const loadThemes = async () => {
+  loading.value = true
+  error.value = null
+  try {
+    const response = await themeService.getSetting()
+    const { values, data } = response.data
+    themes.value = Object.values(data).map((theme) => ({
+      id: theme.slug,
+      name: theme.name,
+      description: theme.description,
+      thumbnail: thumbnailUrl(theme.preview, theme.name),
+      active: values.theme === theme.slug,
+    }))
+  } catch (e) {
+    error.value = 'Nem sikerült betölteni a témákat.'
+  } finally {
+    loading.value = false
+  }
 }
+
+const activateTheme = async (themeId: string) => {
+  try {
+    await themeService.updateSetting(themeId)
+    themes.value = themes.value.map((t) => ({
+      ...t,
+      active: t.id === themeId,
+    }))
+  } catch (e) {
+    error.value = 'Nem sikerült aktiválni a témát.'
+  }
+}
+
+onMounted(() => {
+  loadThemes()
+})
 </script>
 
 <template>
@@ -79,8 +70,21 @@ const activateTheme = (themeId: string) => {
         </div>
       </div>
 
+      <!-- Loading -->
+      <div v-if="loading" class="flex items-center justify-center py-16 text-muted-foreground">
+        <span class="text-sm">Témák betöltése...</span>
+      </div>
+
+      <!-- Error -->
+      <div
+        v-else-if="error"
+        class="rounded-lg border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm text-destructive"
+      >
+        {{ error }}
+      </div>
+
       <!-- Theme Grid -->
-      <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+      <div v-else class="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
         <div
           v-for="theme in themes"
           :key="theme.id"
