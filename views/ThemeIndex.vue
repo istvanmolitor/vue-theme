@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { AdminLayout } from '@admin'
-import { Check, Palette } from 'lucide-vue-next'
+import { Check } from 'lucide-vue-next'
 import { themeService } from '../services/themeService'
 
 interface Theme {
