@@ -11,7 +11,7 @@ export class ThemeMenuBuilder extends MenuBuilder {
       id: 'themes',
       title: 'Témák',
       icon: Palette,
-      path: '/themes',
+      path: '/admin/theme',
       order: 90,
       children: [],
     }
