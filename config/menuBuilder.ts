@@ -14,6 +14,7 @@ export class ThemeMenuBuilder extends MenuBuilder {
       path: '/admin/theme',
       order: 90,
       children: [],
+      permission: 'theme'
     }
 
     this.addMenuItem(menu, themeSection)
