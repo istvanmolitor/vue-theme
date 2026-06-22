@@ -27,6 +27,9 @@ onMounted(async () => {
   try {
     const { data } = await layoutService.getAll()
     options.value = data.data
+    if (!props.modelValue && options.value.length > 0) {
+      emit('update:modelValue', options.value[0].value)
+    }
   } catch {
     // fallback: empty list
   }
