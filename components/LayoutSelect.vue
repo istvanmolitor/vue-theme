@@ -11,10 +11,12 @@ const props = withDefaults(defineProps<{
   label?: string
   placeholder?: string
   id?: string
+  required?: boolean
 }>(), {
   label: 'Sablon',
   placeholder: 'Válassz sablont...',
   id: 'layout',
+  required: false,
 })
 
 const emit = defineEmits<{
@@ -38,7 +40,7 @@ onMounted(async () => {
 
 <template>
   <div class="space-y-2">
-    <Label :for="id" class="text-sm font-medium">{{ label }}</Label>
+    <Label :for="id" class="text-sm font-medium">{{ label }} <span v-if="required" class="text-destructive">*</span></Label>
     <Select
       :id="id"
       :model-value="modelValue"
