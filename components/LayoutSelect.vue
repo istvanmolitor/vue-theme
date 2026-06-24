@@ -40,7 +40,7 @@ onMounted(async () => {
 
 <template>
   <div class="space-y-2">
-    <Label :for="id" class="text-sm font-medium">{{ label }} <span v-if="required" class="text-destructive">*</span></Label>
+    <Label :for="id">{{ label }} <span v-if="required" class="text-destructive">*</span></Label>
     <Select
       :id="id"
       :model-value="modelValue"
